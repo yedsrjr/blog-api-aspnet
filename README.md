@@ -75,4 +75,15 @@ dotnet restore
 dotnet run
 ```
 
+## Testando no Postman
+
+Quem quiser testar a API pode importar o arquivo `Blog-Postman.Json` no Postman.
+
+Nele já deixei uma collection com exemplos de requisições para usar os endpoints da API, como:
+
+- `GET`
+- `POST`
+- `PUT`
+- `DELETE`
+
 Esse projeto é só para estudo e prática dos conceitos básicos.
