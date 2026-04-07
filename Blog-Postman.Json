@@ -1,0 +1,156 @@
+{
+  "info": {
+    "_postman_id": "8a32bd8a-7fa9-4098-a094-9307323be775",
+    "name": "Blog",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "28449229"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:6142",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "6142"
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Categories",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:6142/v1/categories",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "6142",
+          "path": [
+            "v1",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get By ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:6142/v1/categories/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "6142",
+          "path": [
+            "v1",
+            "categories",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Category",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"Backend\",\r\n    \"slug\": \"backend\",\r\n    \"posts\": []\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:6142/v1/categories",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "6142",
+          "path": [
+            "v1",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Put Category",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"FullStack\",\r\n    \"slug\": \"fullstack\",\r\n    \"posts\": []\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:6142/v1/categories/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "6142",
+          "path": [
+            "v1",
+            "categories",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Category",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\": \"FullStack\",\r\n    \"slug\": \"fullstack\",\r\n    \"posts\": []\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:6142/v1/categories/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "6142",
+          "path": [
+            "v1",
+            "categories",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
