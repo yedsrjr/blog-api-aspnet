@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Blog.Controllers
 {
     [ApiController]
-    public class HomeController(BlogDataContext context) : ControllerBase
+    public class HomeController : ControllerBase
     {
         [HttpGet("")]
         public IActionResult Get()

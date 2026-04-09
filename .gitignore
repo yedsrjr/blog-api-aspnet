@@ -8,3 +8,4 @@ obj/
 *.pdb
 
 TestResults/
+Blog.csproj.Backup.tmp

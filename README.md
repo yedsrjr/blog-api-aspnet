@@ -1,74 +1,103 @@
 # Blog API
 
-Projeto de estudo feito acompanhando as aulas da Balta.io
+Projeto de estudo feito acompanhando as aulas da Balta.io.
 
-A ideia aqui foi praticar a criação de uma API com ASP.NET Core e Entity Framework Core, entendendo melhor a estrutura do projeto, acesso a dados, validações e operações assíncronas.
+A proposta deste projeto foi praticar a criacao de uma API com ASP.NET Core, Entity Framework Core e, na etapa atual, autenticacao com JWT.
 
-## O que tem no projeto
+## O que foi desenvolvido
 
-### `HomeController`
+### Categorias
 
-Controller simples só para testar se a aplicação está respondendo.
+O projeto possui um CRUD de categorias com os endpoints de:
 
-### `CategoryController`
-
-Foi o controller principal do estudo.
-
-Nele eu trabalhei:
-
-- listagem de categorias
+- listagem
 - busca por id
 - cadastro
-- edição
-- exclusão
+- edicao
+- exclusao
 
-Também usei:
+Nessa parte foram praticados:
 
 - `async/await`
+- validacao com `ModelState`
 - `try/catch`
-- `ModelState`
-- retornos como `Ok`, `Created`, `BadRequest` e `NotFound`
+- retorno padronizado de respostas
+
+### Autenticacao com JWT
+
+Foi adicionada uma estrutura inicial de autenticacao usando token JWT.
+
+O projeto agora conta com:
+
+- geracao de token em `AccountController`
+- `TokenService` para emissao do JWT
+- configuracao de autenticacao no `Program.cs`
+- endpoints protegidos com `[Authorize]`
+- controle de acesso por perfil usando roles como:
+  - `user`
+  - `author`
+  - `admin`
+
+## Estrutura principal
+
+### `Controllers`
+
+- `HomeController`
+  Endpoint simples para teste da aplicacao.
+
+- `CategoryController`
+  Controller principal do CRUD de categorias.
+
+- `AccountController`
+  Controller criado para login e teste de rotas autenticadas com JWT.
 
 ### `Data`
 
-A pasta `Data` tem o `BlogDataContext`, que faz a comunicação com o banco usando Entity Framework Core.
+A pasta `Data` contem o `BlogDataContext`, responsavel pelo acesso ao banco com Entity Framework Core.
 
-Nessa parte eu usei:
+Nessa parte foram utilizados:
 
 - `DbContext`
 - `DbSet`
 - `UseSqlServer`
 - mapeamentos com Fluent API
 
+### `Services`
+
+A pasta `Services` contem o `TokenService`, responsavel por gerar o token JWT da aplicacao.
+
 ### `Extensions`
 
-Na pasta `Extensions` tem uma extensão para pegar os erros do `ModelState` e devolver as mensagens de validação de forma mais organizada.
+Foi criada uma extensao para ler os erros do `ModelState` e retornar mensagens de validacao de forma mais organizada.
 
 ### `ViewModels`
 
-Usei `ViewModels` para separar melhor os dados recebidos pela API.
+Os `ViewModels` foram usados para separar melhor os dados recebidos e retornados pela API.
 
-#### `CategoryViewModel`
+Destaques:
 
-Foi usado para validar os dados da categoria com:
+- `CategoryViewModel`
+- `ResultViewModel`
 
-- `[Required]`
-- `[StringLength]`
+## Tecnologias utilizadas
 
-#### `ResultViewModel`
-
-Usei para padronizar as respostas da API, retornando dados ou erros.
-
-## O que pratiquei nesse estudo
-
-- criação de API com ASP.NET Core
+- ASP.NET Core
 - Entity Framework Core
-- validações com Data Annotations
-- operações assíncronas com `async/await`
-- organização por pastas
+- SQL Server
+- JWT Bearer Authentication
+- C#
+
+## O que foi praticado
+
+- criacao de API REST com ASP.NET Core
+- organizacao por pastas
+- validacoes com Data Annotations
+- operacoes assincronas com `async/await`
+- autenticacao com JWT
+- autorizacao com roles
 - tratamento de erros
 
-## Para rodar
+## Como executar
 
 ```bash
 dotnet restore
@@ -79,11 +108,14 @@ dotnet run
 
 Quem quiser testar a API pode importar o arquivo `Blog-Postman.Json` no Postman.
 
-Nele já deixei uma collection com exemplos de requisições para usar os endpoints da API, como:
+Nele e possivel testar endpoints como:
 
 - `GET`
 - `POST`
 - `PUT`
 - `DELETE`
+- rotas autenticadas com token
 
-Esse projeto é só para estudo e prática dos conceitos básicos.
+## Observacao
+
+Este projeto tem foco em estudo e pratica. A implementacao atual foi usada para consolidar fundamentos de API, persistencia com EF Core e autenticacao com JWT.
