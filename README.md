@@ -1,6 +1,6 @@
 # Blog API
 
-Projeto baseado em estudos de APIs .NET, evoluído com foco em autenticação, arquitetura e boas práticas
+Projeto baseado em estudos de APIs .NET, evoluido com foco em autenticacao, arquitetura e boas praticas.
 
 O foco deste repositorio e praticar:
 
@@ -12,17 +12,15 @@ O foco deste repositorio e praticar:
 
 ## Arquitetura
 
-O projeto foi estruturado visando baixo acoplamento e facilidade de manutenção.
+O projeto foi estruturado visando baixo acoplamento e facilidade de manutencao.
 
-O fluxo da aplicação segue:
+Fluxo principal:
 
-Controller → Service → Data
+`Controller -> Service -> Data`
 
-- Controllers: recebem requisições e validam entrada
-- Services: concentram regras de negócio
-- Data: acesso ao banco via EF Core
-
-Essa separação permite evoluir regras sem impactar outras camadas.
+- `Controllers`: recebem requisicoes e validam entrada
+- `Services`: concentram comportamentos de suporte, como geracao de token
+- `Data`: acesso ao banco via EF Core
 
 ## Funcionalidades
 
@@ -60,10 +58,8 @@ Blog/
 |       |-- PostMap.cs
 |       `-- UserMap.cs
 |-- Extensions/
-|   |-- Auth/
-|   |   `-- RoleClaimsExtension.cs
-|   `-- Validation/
-|       `-- ModelStateExtension.cs
+|   |-- ModelStateExtension.cs
+|   `-- RoleClaimsExtension.cs
 |-- Migrations/
 |-- Models/
 |   |-- Category.cs
@@ -71,17 +67,18 @@ Blog/
 |   |-- Role.cs
 |   |-- Tag.cs
 |   `-- User.cs
+|-- Properties/
+|   `-- launchSettings.json
 |-- Services/
 |   `-- TokenService.cs
 |-- ViewModels/
-|   |-- Account/
-|   |   |-- LoginViewModel.cs
-|   |   `-- RegisterViewModel.cs
-|   |-- Category/
-|   |   `-- CategoryViewModel.cs
-|   `-- Shared/
-|       `-- ResultViewModel.cs
+|   |-- CategoryViewModel.cs
+|   |-- LoginViewModel.cs
+|   |-- RegisterViewModel.cs
+|   `-- ResultViewModel.cs
 |-- Blog-Postman.json
+|-- Blog.csproj
+|-- Blog.sln
 |-- Configuration.cs
 |-- Program.cs
 `-- README.md
@@ -91,11 +88,11 @@ Blog/
 
 ### `Controllers`
 
-Recebem as requisicoes HTTP, validam entrada, chamam a camada de dados/servicos e devolvem a resposta da API.
+Recebem as requisicoes HTTP, validam a entrada e devolvem as respostas da API.
 
 ### `Data`
 
-Centraliza o acesso ao banco de dados:
+Centraliza o acesso ao banco:
 
 - `BlogDataContext` com os `DbSet`s
 - mapeamentos Fluent API em `Mappings/`
@@ -105,8 +102,8 @@ Centraliza o acesso ao banco de dados:
 
 Agrupa extensoes reutilizaveis da aplicacao:
 
-- `Auth/RoleClaimsExtension`: transforma roles do usuario em claims do token
-- `Validation/ModelStateExtension`: converte erros de validacao em lista padronizada
+- `ModelStateExtension`: transforma erros de validacao em uma lista padronizada
+- `RoleClaimsExtension`: converte roles do usuario em claims do token
 
 ### `Models`
 
@@ -114,15 +111,11 @@ Entidades principais do dominio persistidas no banco.
 
 ### `Services`
 
-Servicos de suporte da aplicacao, como a emissao de JWT.
+Servicos auxiliares da aplicacao, como a emissao de JWT.
 
 ### `ViewModels`
 
-Modelos de entrada e saida organizados por contexto:
-
-- `Account/`: login e cadastro
-- `Category/`: payloads de categoria
-- `Shared/`: respostas padronizadas
+Modelos usados para entrada e saida de dados nas rotas da API.
 
 ## Autenticacao e roles
 
@@ -144,9 +137,9 @@ dotnet restore
 dotnet run
 ```
 
-## Testes (em evolução)
+## Testes de API
 
-O projeto está sendo evoluído para incluir testes unitários focados na camada de serviço, garantindo a consistência das regras de negócio.
+Para testar as rotas manualmente, importe o arquivo `Blog-Postman.json` no Postman.
 
 ## Tecnologias
 
@@ -158,4 +151,4 @@ O projeto está sendo evoluído para incluir testes unitários focados na camada
 
 ## Observacao
 
-Projeto em evolução contínua com foco em boas práticas de desenvolvimento backend
+Projeto em evolucao continua com foco em boas praticas de desenvolvimento backend.
