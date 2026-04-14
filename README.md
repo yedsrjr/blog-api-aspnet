@@ -1,101 +1,141 @@
 # Blog API
 
-Projeto de estudo feito acompanhando as aulas da Balta.io.
+Projeto baseado em estudos de APIs .NET, evoluído com foco em autenticação, arquitetura e boas práticas
 
-A proposta deste projeto foi praticar a criacao de uma API com ASP.NET Core, Entity Framework Core e, na etapa atual, autenticacao com JWT.
+O foco deste repositorio e praticar:
 
-## O que foi desenvolvido
+- criacao de API REST
+- organizacao por camadas e pastas
+- validacao com Data Annotations e `ModelState`
+- persistencia com EF Core
+- autenticacao e autorizacao com JWT + roles
+
+## Arquitetura
+
+O projeto foi estruturado visando baixo acoplamento e facilidade de manutenção.
+
+O fluxo da aplicação segue:
+
+Controller → Service → Data
+
+- Controllers: recebem requisições e validam entrada
+- Services: concentram regras de negócio
+- Data: acesso ao banco via EF Core
+
+Essa separação permite evoluir regras sem impactar outras camadas.
+
+## Funcionalidades
 
 ### Categorias
 
-O projeto possui um CRUD de categorias com os endpoints de:
+CRUD completo de categorias com endpoints para:
 
-- listagem
-- busca por id
-- cadastro
-- edicao
-- exclusao
+- listar
+- buscar por id
+- cadastrar
+- editar
+- remover
 
-Nessa parte foram praticados:
+### Autenticacao
 
-- `async/await`
-- validacao com `ModelState`
-- `try/catch`
-- retorno padronizado de respostas
+Fluxo de autenticacao com:
 
-### Autenticacao com JWT
+- `POST /v1/accounts/` para cadastro de usuario
+- `POST /v1/accounts/login` para login
+- geracao de token JWT em `TokenService`
+- claims montadas a partir do usuario e dos seus roles
 
-Foi adicionada uma estrutura inicial de autenticacao usando token JWT.
+## Estrutura de pastas
 
-O projeto agora conta com:
+```text
+Blog/
+|-- Controllers/
+|   |-- AccountController.cs
+|   |-- CategoryController.cs
+|   `-- HomeController.cs
+|-- Data/
+|   |-- BlogDataContext.cs
+|   `-- Mappings/
+|       |-- CategoryMap.cs
+|       |-- PostMap.cs
+|       `-- UserMap.cs
+|-- Extensions/
+|   |-- Auth/
+|   |   `-- RoleClaimsExtension.cs
+|   `-- Validation/
+|       `-- ModelStateExtension.cs
+|-- Migrations/
+|-- Models/
+|   |-- Category.cs
+|   |-- Post.cs
+|   |-- Role.cs
+|   |-- Tag.cs
+|   `-- User.cs
+|-- Services/
+|   `-- TokenService.cs
+|-- ViewModels/
+|   |-- Account/
+|   |   |-- LoginViewModel.cs
+|   |   `-- RegisterViewModel.cs
+|   |-- Category/
+|   |   `-- CategoryViewModel.cs
+|   `-- Shared/
+|       `-- ResultViewModel.cs
+|-- Blog-Postman.json
+|-- Configuration.cs
+|-- Program.cs
+`-- README.md
+```
 
-- geracao de token em `AccountController`
-- `TokenService` para emissao do JWT
-- configuracao de autenticacao no `Program.cs`
-- endpoints protegidos com `[Authorize]`
-- controle de acesso por perfil usando roles como:
-  - `user`
-  - `author`
-  - `admin`
-
-## Estrutura principal
+## Responsabilidades por pasta
 
 ### `Controllers`
 
-- `HomeController`
-  Endpoint simples para teste da aplicacao.
-
-- `CategoryController`
-  Controller principal do CRUD de categorias.
-
-- `AccountController`
-  Controller criado para login e teste de rotas autenticadas com JWT.
+Recebem as requisicoes HTTP, validam entrada, chamam a camada de dados/servicos e devolvem a resposta da API.
 
 ### `Data`
 
-A pasta `Data` contem o `BlogDataContext`, responsavel pelo acesso ao banco com Entity Framework Core.
+Centraliza o acesso ao banco de dados:
 
-Nessa parte foram utilizados:
-
-- `DbContext`
-- `DbSet`
-- `UseSqlServer`
-- mapeamentos com Fluent API
-
-### `Services`
-
-A pasta `Services` contem o `TokenService`, responsavel por gerar o token JWT da aplicacao.
+- `BlogDataContext` com os `DbSet`s
+- mapeamentos Fluent API em `Mappings/`
+- migrations geradas pelo EF Core
 
 ### `Extensions`
 
-Foi criada uma extensao para ler os erros do `ModelState` e retornar mensagens de validacao de forma mais organizada.
+Agrupa extensoes reutilizaveis da aplicacao:
+
+- `Auth/RoleClaimsExtension`: transforma roles do usuario em claims do token
+- `Validation/ModelStateExtension`: converte erros de validacao em lista padronizada
+
+### `Models`
+
+Entidades principais do dominio persistidas no banco.
+
+### `Services`
+
+Servicos de suporte da aplicacao, como a emissao de JWT.
 
 ### `ViewModels`
 
-Os `ViewModels` foram usados para separar melhor os dados recebidos e retornados pela API.
+Modelos de entrada e saida organizados por contexto:
 
-Destaques:
+- `Account/`: login e cadastro
+- `Category/`: payloads de categoria
+- `Shared/`: respostas padronizadas
 
-- `CategoryViewModel`
-- `ResultViewModel`
+## Autenticacao e roles
 
-## Tecnologias utilizadas
+O token JWT e configurado no `Program.cs` e gerado pelo `TokenService`.
 
-- ASP.NET Core
-- Entity Framework Core
-- SQL Server
-- JWT Bearer Authentication
-- C#
+No login:
 
-## O que foi praticado
+1. o usuario informa email e senha
+2. o sistema valida o payload com `LoginViewModel`
+3. o usuario e carregado com seus roles
+4. o token e emitido com claims de identificacao e permissao
 
-- criacao de API REST com ASP.NET Core
-- organizacao por pastas
-- validacoes com Data Annotations
-- operacoes assincronas com `async/await`
-- autenticacao com JWT
-- autorizacao com roles
-- tratamento de erros
+Isso prepara o projeto para uso com `[Authorize]` e regras baseadas em roles.
 
 ## Como executar
 
@@ -104,18 +144,18 @@ dotnet restore
 dotnet run
 ```
 
-## Testando no Postman
+## Testes (em evolução)
 
-Quem quiser testar a API pode importar o arquivo `Blog-Postman.Json` no Postman.
+O projeto está sendo evoluído para incluir testes unitários focados na camada de serviço, garantindo a consistência das regras de negócio.
 
-Nele e possivel testar endpoints como:
+## Tecnologias
 
-- `GET`
-- `POST`
-- `PUT`
-- `DELETE`
-- rotas autenticadas com token
+- ASP.NET Core
+- Entity Framework Core
+- SQL Server
+- JWT Bearer Authentication
+- C#
 
 ## Observacao
 
-Este projeto tem foco em estudo e pratica. A implementacao atual foi usada para consolidar fundamentos de API, persistencia com EF Core e autenticacao com JWT.
+Projeto em evolução contínua com foco em boas práticas de desenvolvimento backend
