@@ -6,13 +6,12 @@ using Blog.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SecureIdentity.Password;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers;
 
 [ApiController]
-public class AccountController(BlogDataContext context, TokenService tokenService) : ControllerBase
+public class AccountController(BlogDataContext context, TokenService tokenService, EmailService emailService) : ControllerBase
 {
     [HttpPost("v1/accounts/login")]
     public async Task<IActionResult> Login([FromBody] LoginViewModel model)
@@ -72,9 +71,17 @@ public class AccountController(BlogDataContext context, TokenService tokenServic
         {
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
+
+            emailService.Send(
+                user.Name,
+                user.Email,
+                subject: "Bem Vindo ao blog!",
+                body: $"Sua senha é <strong>{password}</strong>"
+            );
+
             return Ok(new ResultViewModel<dynamic>(new
             {
-                user = user.Email, password
+                user = user.Email,
             }));
         }
         catch(DbUpdateException)
