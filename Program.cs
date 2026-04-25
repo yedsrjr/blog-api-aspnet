@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json.Serialization;
 using Blog;
 using Blog.Data;
 using Blog.Services;
@@ -24,11 +25,10 @@ app.UseStaticFiles();
 app.MapControllers();
 app.Run();
 
-// Paramos no #F0447
+// Paramos no #F0456
 
 void LoadConfiguration(WebApplication app)
-{
-    
+{   
     Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
     Configuration.ApiKeyName = app.Configuration.GetValue<string>("ApiKeyName");
     Configuration.ApiKey = app.Configuration.GetValue<string>("ApiKey");
@@ -36,7 +36,6 @@ void LoadConfiguration(WebApplication app)
     var smtp = new Configuration.SmtpConfiguration();
     app.Configuration.GetSection("Smtp").Bind(smtp);
     Configuration.Smtp = smtp;
-
 }
 
 void ConfigureAuthentication(WebApplicationBuilder app)
@@ -64,6 +63,11 @@ void ConfigureMvc(WebApplicationBuilder builder)
     .ConfigureApiBehaviorOptions(options =>
     {
         options.SuppressModelStateInvalidFilter = true;
+    })
+    .AddJsonOptions(x =>
+    {
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
     });
 }
 
