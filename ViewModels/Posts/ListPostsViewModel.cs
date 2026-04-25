@@ -11,4 +11,5 @@ public class ListPostsViewModel
     public DateTime LastUpdateDate { get; set; }
     public string Category { get; set; }
     public string Author { get; set; }
+    public string Roles { get; set; }
 }
