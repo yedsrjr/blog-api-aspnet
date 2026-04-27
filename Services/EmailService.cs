@@ -29,8 +29,8 @@ public class EmailService
 
         try
         {
-        smtp.Send(mail);
-        return true;
+            smtp.Send(mail);
+            return true;
         }
         catch (System.Exception)
         {

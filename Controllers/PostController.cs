@@ -1,13 +1,16 @@
+using Blog.Data;
+using Blog.Extensions;
+using Blog.Models;
+using Blog.ViewModels;
+using Blog.ViewModels.Categories;
+using Blog.ViewModels.Posts;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blog.Data;
-using Blog.Models;
-using Blog.ViewModels;
-using Blog.ViewModels.Posts;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Controllers;
 
@@ -123,5 +126,50 @@ public class PostController(BlogDataContext context) : ControllerBase
             return StatusCode(500, new ResultViewModel<List<Post>>("05X04 - Falha interna do servidor"));
         }
         
+    }
+
+    [Authorize]
+    [HttpPost("v1/posts")]
+    public async Task<IActionResult> PostAsync([FromBody] PostViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ResultViewModel<Post>(ModelState.GetErrors()));
+        }
+
+        var user = await context.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+        if (user == null)
+        {
+            return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+        }
+
+        try
+        {
+            var post = new Post
+            {
+                Id = 0,
+                Title = model.Title,
+                Summary = model.Summary,
+                Body = model.Body,
+                Slug = model.Slug.ToLower(),
+                Category = await context.Categories.FirstOrDefaultAsync(x => x.Id == model.Category),
+                Author = user,
+                Tags = null
+            };
+
+            await context.Posts.AddAsync(post);
+            await context.SaveChangesAsync();
+
+            return Created($"v1/posts/{post.Id}", post);
+        }
+        catch (DbUpdateException)
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05XE9 - Não foi possível incluir a categoria"));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05X10 - Falha interna no servidor"));
+        }
     }
 }
