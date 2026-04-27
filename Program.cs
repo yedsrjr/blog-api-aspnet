@@ -1,10 +1,12 @@
-﻿using System.Text;
+﻿using System.IO.Compression;
+using System.Text;
 using System.Text.Json.Serialization;
 using Blog;
 using Blog.Data;
 using Blog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -21,6 +23,7 @@ LoadConfiguration(app);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseResponseCompression();
 app.UseStaticFiles();
 app.MapControllers();
 app.Run();
@@ -60,6 +63,17 @@ void ConfigureAuthentication(WebApplicationBuilder app)
 void ConfigureMvc(WebApplicationBuilder builder)
 {
     builder.Services.AddMemoryCache();
+    
+    builder.Services.AddResponseCompression(options =>
+    {
+        options.Providers.Add<GzipCompressionProvider>();
+    });
+
+    builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+    {
+        options.Level = CompressionLevel.Optimal;
+    });
+
     builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
