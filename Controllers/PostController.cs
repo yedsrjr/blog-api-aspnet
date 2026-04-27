@@ -80,7 +80,7 @@ public class PostController(BlogDataContext context) : ControllerBase
         
     }
 
-     [HttpGet("v1/posts/category/{category}")]
+    [HttpGet("v1/posts/category/{category}")]
     public async Task<IActionResult> GetByCategoryAsync(string category, int page = 0, int pageSize = 25)
     {
         try

@@ -5,26 +5,39 @@ using Blog.ViewModels;
 using Blog.ViewModels.Categories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers
 {
     [ApiController]
-    public class CategoryController(BlogDataContext context) : ControllerBase
+    public class CategoryController(BlogDataContext context, IMemoryCache cache) : ControllerBase
     {
         [HttpGet("v1/categories")]
         public async Task<IActionResult> GetAsync()
         {
             try
             {
-                var categories = await context.Categories.ToListAsync();
+                // var categories = await context.Categories.ToListAsync();
+                var categories = cache.GetOrCreate("CategoriesCache", entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
+                    return GetCategories();
+                });
                 return Ok(new ResultViewModel<List<Category>>(categories));
             }
             catch
             {
                 return StatusCode(500, new ResultViewModel<List<Category>>("05X02 - Falha interna no servidor"));
             }
+        }
+
+        private List<Category> GetCategories()
+        {
+            return context.Categories.ToList();
         }
 
         [HttpGet("v1/categories/{id:int}")]
