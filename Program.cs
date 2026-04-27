@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+using System;
+using System.IO.Compression;
 using System.Text;
 using System.Text.Json.Serialization;
 using Blog;
@@ -9,7 +10,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,12 @@ var app = builder.Build();
 
 LoadConfiguration(app);
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseResponseCompression();
@@ -28,7 +37,7 @@ app.UseStaticFiles();
 app.MapControllers();
 app.Run();
 
-// Paramos no #F0456
+// Paramos no #F0461
 
 void LoadConfiguration(WebApplication app)
 {   
@@ -62,8 +71,43 @@ void ConfigureAuthentication(WebApplicationBuilder app)
 
 void ConfigureMvc(WebApplicationBuilder builder)
 {
-    builder.Services.AddMemoryCache();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "Blog API",
+            Version = "v1"
+        });
+
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Informe o token JWT no formato: Bearer {seu_token}"
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+    });
     
+    builder.Services.AddMemoryCache();
+
     builder.Services.AddResponseCompression(options =>
     {
         options.Providers.Add<GzipCompressionProvider>();
