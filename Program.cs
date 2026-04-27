@@ -8,6 +8,7 @@ using Blog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,14 +31,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseResponseCompression();
-app.UseStaticFiles();
 app.MapControllers();
+app.UseStaticFiles();
+app.UseResponseCompression();
 app.Run();
 
-// Paramos no #F0461
+// Paramos no #F0469
 
 void LoadConfiguration(WebApplication app)
 {   
@@ -132,7 +134,12 @@ void ConfigureMvc(WebApplicationBuilder builder)
 
 void ConfigureServices(WebApplicationBuilder builder)
 {
-    builder.Services.AddDbContext<BlogDataContext>();
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<BlogDataContext>(options =>
+    {
+        options.UseSqlServer(connectionString);
+    });
+
     builder.Services.AddTransient<TokenService>();
     builder.Services.AddTransient<EmailService>();
 }
