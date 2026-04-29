@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers;
@@ -172,4 +173,93 @@ public class PostController(BlogDataContext context) : ControllerBase
             return StatusCode(500, new ResultViewModel<List<Category>>("05X10 - Falha interna no servidor"));
         }
     }
+
+    [Authorize]
+    [HttpPut("v1/posts/{id:int}")]
+    public async Task<IActionResult> PutAsync([FromRoute] int id, [FromBody] PostViewModel model)
+    {
+        try
+        {
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (user == null)
+            {
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+            }
+
+            var post = await context.Posts
+                .Include(x => x.Author)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            
+            if (post == null)
+            {
+                return NotFound(new ResultViewModel<Post>("Conteúdo não encontrado"));
+            }
+
+            if (post.Author == null || post.Author.Id != user.Id)
+            {
+                return StatusCode(401, new ResultViewModel<string>("Não autorizado a editar este conteúdo"));
+            }
+
+            post.Title = model.Title;
+            post.Summary = model.Summary;
+            post.Slug = model.Slug;
+            post.Body = model.Body;
+            post.Category = await context.Categories.FirstOrDefaultAsync(x => x.Id == model.Category);
+
+            context.Posts.Update(post);
+            await context.SaveChangesAsync();
+
+            return Ok(new ResultViewModel<Post>(post));
+        }
+        catch (DbUpdateException)
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05XE9 - Não foi possível incluir a categoria"));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05X10 - Falha interna no servidor"));
+        }
+    }
+
+    [Authorize]
+    [HttpDelete("v1/posts/{id:int}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+    {
+        try
+        {
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+            if (user == null)
+            {
+                return NotFound(new ResultViewModel<User>("Usuário não encontrado"));
+            }
+
+            var post = await context.Posts
+                .Include(x => x.Author)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            
+            if (post == null)
+            {
+                return NotFound(new ResultViewModel<Post>("Conteúdo não encontrado"));
+            } else if (post.Author == null || post.Author.Id != user.Id)
+            {
+                return StatusCode(401, new ResultViewModel<string>("Não autorizado a editar este conteúdo"));
+            }
+            
+            context.Posts.Remove(post);
+            await context.SaveChangesAsync();
+
+            return Ok(new ResultViewModel<Post>(post));
+        }
+        catch (DbUpdateException)
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05XE9 - Não foi possível incluir a categoria"));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<List<Category>>("05X10 - Falha interna no servidor"));
+        }
+    }
+    
 }
