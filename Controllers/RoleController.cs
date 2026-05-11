@@ -1,6 +1,8 @@
 ﻿using Blog.Data;
+using Blog.Extensions;
 using Blog.Models;
 using Blog.ViewModels;
+using Blog.ViewModels.Roles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -27,5 +29,56 @@ namespace Blog.Controllers
                 return StatusCode(500, new ResultViewModel<List<Role>>("05X02 - Falha interna no servidor"));
             }
         }
+
+        [HttpGet("v1/roles/{id:int}")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            try
+            {
+                var role = await context.Roles
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (role == null)
+                {
+                    return NotFound(new ResultViewModel<Role>("Conteúdo não encontrado"));
+                }
+
+
+                return Ok(new ResultViewModel<Role>(role));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<Role>("05X02 - Falha interna no servidor"));
+            }
+        }
+
+        //[HttpPost("v1/roles/{id:int}")]
+        //public async Task<IActionResult> PostAsync(RoleViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(new ResultViewModel<Role>(ModelState.GetErrors()));
+        //    }
+
+        //    try
+        //    {
+        //        var role = new
+        //        {
+
+        //        }
+        //        if (role == null)
+        //        {
+        //            return NotFound(new ResultViewModel<Role>("Conteúdo não encontrado"));
+        //        }
+
+
+        //        return Ok(new ResultViewModel<Role>(role));
+        //    }
+        //    catch
+        //    {
+        //        return StatusCode(500, new ResultViewModel<Role>("05X02 - Falha interna no servidor"));
+        //    }
+        //}
     }
 }
