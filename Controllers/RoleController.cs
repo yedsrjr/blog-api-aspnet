@@ -1,4 +1,5 @@
-﻿using Blog.Data;
+﻿using Azure;
+using Blog.Data;
 using Blog.Extensions;
 using Blog.Models;
 using Blog.ViewModels;
@@ -53,32 +54,37 @@ namespace Blog.Controllers
             }
         }
 
-        //[HttpPost("v1/roles/{id:int}")]
-        //public async Task<IActionResult> PostAsync(RoleViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(new ResultViewModel<Role>(ModelState.GetErrors()));
-        //    }
+        [HttpPost("v1/roles")]
+        public async Task<IActionResult> PostAsync([FromBody] RoleViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ResultViewModel<Role>(ModelState.GetErrors()));
+            }
 
-        //    try
-        //    {
-        //        var role = new
-        //        {
+            try
+            {
+                var role = new Role
+                {
+                    Id = 0,
+                    Name = model.Name,
+                    Slug = model.Slug,
+                    Users = null
+                };
 
-        //        }
-        //        if (role == null)
-        //        {
-        //            return NotFound(new ResultViewModel<Role>("Conteúdo não encontrado"));
-        //        }
+                await context.Roles.AddAsync(role);
+                await context.SaveChangesAsync();
 
-
-        //        return Ok(new ResultViewModel<Role>(role));
-        //    }
-        //    catch
-        //    {
-        //        return StatusCode(500, new ResultViewModel<Role>("05X02 - Falha interna no servidor"));
-        //    }
-        //}
+                return Created($"v1/tags/{role.Id}", role);
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(500, new ResultViewModel<List<Role>>("05XE9 - Não foi possível incluir a role"));
+            }
+            catch
+            {
+                return StatusCode(500, new ResultViewModel<Role>("05X02 - Falha interna no servidor"));
+            }
+        }
     }
 }
